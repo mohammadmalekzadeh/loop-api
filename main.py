@@ -1,7 +1,7 @@
 # app/main.py
 
 from fastapi import FastAPI
-from app.v1.database.init_db import init_db
+from app.db.init_db import init_db
 
 app = FastAPI()
 

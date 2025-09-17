@@ -11,3 +11,7 @@ class VerifyRequest(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
+
+class SignupRequest(BaseModel):
+    phone: str
+    name: str

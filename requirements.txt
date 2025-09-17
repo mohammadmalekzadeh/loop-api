@@ -3,3 +3,6 @@ uvicorn
 SQLAlchemy
 pydantic
 python-dotenv
+PyJWT
+passlib[bcrypt]
+python-jose[cryptography]

@@ -12,3 +12,4 @@ class Product(Base):
     price = Column(Integer, nullable=False)
 
     vendors = relationship("Vendors", back_populates="product")
+    request = relationship("Request", back_populates="product")

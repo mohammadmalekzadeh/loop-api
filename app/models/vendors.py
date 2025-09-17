@@ -7,7 +7,7 @@ class Vendors(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    phone_number = Column(Integer, nullable=False)
+    phone = Column(String, nullable=False)
     nation_code = Column(String, unique=True, nullable=False)
     shop_name = Column(String, nullable=False)
     shop_address = Column(Text, nullable=False)

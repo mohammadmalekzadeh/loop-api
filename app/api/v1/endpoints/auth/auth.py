@@ -17,7 +17,7 @@ def get_db():
         db.close()
 
 @router.post("/signup")
-def signup(request: SignupRequest, db: Session = Depends(get_db)):
+async def signup(request: SignupRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.phone == request.phone).first()
     
     if user:
@@ -36,7 +36,7 @@ def signup(request: SignupRequest, db: Session = Depends(get_db)):
     return {"otp": otp}
 
 @router.post("/login")
-def login(request: LoginRequest, db: Session = Depends(get_db)):
+async def login(request: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.phone == request.phone).first()
     
     if not user:
@@ -50,7 +50,7 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     return {"otp": otp}
 
 @router.post("/verify", response_model= TokenResponse)
-def verify(request: VerifyRequest, db: Session = Depends(get_db)):
+async def verify(request: VerifyRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.phone == request.phone).first()
 
     if not user:
@@ -64,17 +64,3 @@ def verify(request: VerifyRequest, db: Session = Depends(get_db)):
 
     token = create_access_token({"sub": str(user.id)})
     return {"access_token": token, "token_type": "bearer"}
-
-
-
-
-
-
-
-
-
-
-
-
-
-

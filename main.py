@@ -8,16 +8,15 @@ from app.api.v1.endpoints.auth import auth
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000/",
-    "https://loop-ui-nu.vercel.app/"
+    "http://localhost:3000",
+    "https://loop-ui-nu.vercel.app"
 ]
 
 app.include_router(auth.router)
 
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=origins,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

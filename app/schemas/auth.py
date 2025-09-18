@@ -15,3 +15,4 @@ class TokenResponse(BaseModel):
 class SignupRequest(BaseModel):
     phone: str
     name: str
+    role: str

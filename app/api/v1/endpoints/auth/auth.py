@@ -23,7 +23,7 @@ def signup(request: SignupRequest, db: Session = Depends(get_db)):
     if user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"data": "User exist"})
 
-    user = User(phone=request.phone, name=request.name)
+    user = User(phone=request.phone, name=request.name, role=request.role)
     db.add(user)
     db.commit()
     db.refresh(user)

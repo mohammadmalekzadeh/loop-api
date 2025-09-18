@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.db.init_db import init_db
 from app.api.v1.endpoints.auth import auth
 from app.api.v1.endpoints.user import router as user
+from app.api.v1.endpoints.request import request
 
 app = FastAPI()
 
@@ -15,6 +16,7 @@ origins = [
 
 app.include_router(auth.router)
 app.include_router(user)
+app.include_router(request.router)
 
 app.add_middleware(
     CORSMiddleware,

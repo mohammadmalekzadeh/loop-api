@@ -2,7 +2,6 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.config import UI_URL
 from app.db.init_db import init_db
 from app.api.v1.endpoints.auth import auth
 

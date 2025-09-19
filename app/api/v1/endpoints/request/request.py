@@ -46,6 +46,7 @@ async def get_requests(
     current_user: User = Depends(get_current_user),
 ):
     user_role = current_user.role
+    status
     
     requests = db.query(Request).join(Product).join(Vendors).filter(Request.user_id == current_user.id).all()
 
@@ -60,7 +61,30 @@ async def get_requests(
             "customer_name": r.user.name,
             "count": r.count,
             "date": r.date.strftime("%Y-%m-%d %H:%M"),
-            "status": r.status.value
+            "status": r.status
         })
 
     return result
+
+@router.put("/update/{request_id}")
+async def update_request_status(
+    request_id: int,
+    status_value: RequestStatusEnum,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    req = db.query(Request).filter(Request.id == request_id).first()
+    if not req:
+        raise HTTPException(status_code= status.HTTP_404_NOT_FOUND, detail="Request not found")
+
+    if current_user.role == "vendors" and req.vendors_id != current_user.id:
+        raise HTTPException(status_code= status.HTTP_403_FORBIDDEN, detail="FORBIDDEN")
+    if current_user.role == "customer" and req.user_id != current_user.id:
+        raise HTTPException(status_code= status.HTTP_403_FORBIDDEN, detail="FORBIDDEN")
+
+    req.status = status_value
+    db.commit()
+    db.refresh(req)
+
+    return {"message": "وضعیت با موفقیت تغییر کرد", "status": req.status}
+

@@ -47,17 +47,17 @@ async def get_requests(
 ):
     user_role = current_user.role
     
-    requests = db.query(Request).filter(Request.user_id == current_user.id).join(Product, Product.id == Request.product_id).join(Vendors, Vendors.id == Request.vendors_id)
+    requests = db.query(Request).join(Product).join(Vendors).filter(Request.user_id == current_user.id).all()
 
-    # تبدیل به دیکشنری برای فرانت
     result = []
     for r in requests:
         result.append({
             "id": r.id,
             "code": r.code,
-            "product_name": r.product.name if r.product else None,
-            "vendor_name": r.vendors.name if r.vendors else None,
-            "customer_name": r.user.name if r.user else None,
+            "product_name": r.product.name,
+            "vendor_name": r.vendors.shop_name,
+            "address": r.vendors.address,
+            "customer_name": r.user.name,
             "count": r.count,
             "date": r.date.strftime("%Y-%m-%d %H:%M"),
             "status": r.status.value

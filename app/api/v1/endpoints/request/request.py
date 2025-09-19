@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models.request import Request, RequestStatusEnum
 from app.schemas.request import RequestCreate, RequestOut
 from app.models.user import User
+from app.models.product import Product
+from app.models.vendors import Vendors
 from app.deps.current_user import get_current_user, get_db
 from typing import List
 import random
@@ -16,6 +18,10 @@ async def create_request(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    user_role = current_user.role
+
+    if user_role == "vendors":return status.HTTP_400_BAD_REQUEST
+
     unique_code = random.randint(100000, 999999)
     while db.query(Request).filter(Request.code == unique_code).first():
         unique_code = random.randint(100000, 999999)
@@ -40,13 +46,8 @@ async def get_requests(
     current_user: User = Depends(get_current_user),
 ):
     user_role = current_user.role
-
-    if user_role == "vendors":
-        # گرفتن درخواست‌هایی که به فروشنده مربوط می‌شود
-        requests = db.query(Request).filter(Request.vendors_id == current_user.vendors.id).all()
-    else:
-        # گرفتن درخواست‌هایی که کاربر (مشتری) ثبت کرده
-        requests = db.query(Request).filter(Request.user_id == current_user.id).all()
+    
+    requests = db.query(Request).filter(Request.user_id == current_user.id).join(Product, Product.id == Request.product_id).join(Vendors, Vendors.id == Request.vendors_id)
 
     # تبدیل به دیکشنری برای فرانت
     result = []
@@ -54,7 +55,7 @@ async def get_requests(
         result.append({
             "id": r.id,
             "code": r.code,
-            "product_name": r.product.name,
+            "product_name": r.product.name if r.product else None,
             "vendor_name": r.vendors.name if r.vendors else None,
             "customer_name": r.user.name if r.user else None,
             "count": r.count,

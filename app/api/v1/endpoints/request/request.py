@@ -12,7 +12,7 @@ import random
 
 router = APIRouter(prefix="/request", tags=["Request"])
 
-@router.post("/create", response_model=RequestOut)
+@router.post("/create")
 async def create_request(
     req: RequestCreate,
     db: Session = Depends(get_db),
@@ -20,7 +20,8 @@ async def create_request(
 ):
     user_role = current_user.role
 
-    if user_role == "vendors":return status.HTTP_400_BAD_REQUEST
+    if user_role == "vendors":
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Vendors couldn't create a request")
 
     unique_code = random.randint(100000, 999999)
     while db.query(Request).filter(Request.code == unique_code).first():

@@ -6,3 +6,5 @@ python-dotenv
 PyJWT
 passlib[bcrypt]
 python-jose[cryptography]
+psycopg2
+psycopg2-binary 

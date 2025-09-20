@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import enum
 
 class UserRoleEnum(str, enum.Enum):
-    vendoers = "vendors"
+    vendors = "vendors"
     customer = "customer"
 
 class User(Base):
@@ -14,7 +14,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     phone = Column(String, nullable=False)
-    role = Column(Enum(UserRoleEnum, name="userroleenum"), default= UserRoleEnum.customer)
+    role = Column(Enum(UserRoleEnum), default= UserRoleEnum.customer)
     otp_code = Column(String, nullable=True)
     otp_expiration = Column(DateTime, nullable=True)
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import datetime
 from app.db.session import SessionLocal
-from app.models.user import User
+from app.models.user import User, UserRoleEnum
 from app.schemas.auth import LoginRequest, TokenResponse, VerifyRequest, SignupRequest
 from app.utils.otp import generate_otp
 from app.core.security import create_access_token
@@ -22,8 +22,10 @@ async def signup(request: SignupRequest, db: Session = Depends(get_db)):
     
     if user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"data": "User exist"})
+    
+    role = UserRoleEnum(request.role)
 
-    user = User(phone=request.phone, name=request.name, role=request.role)
+    user = User(phone=request.phone, name=request.name, role=role)
     db.add(user)
     db.commit()
     db.refresh(user)

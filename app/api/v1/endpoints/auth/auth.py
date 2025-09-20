@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from app.db.session import SessionLocal
 from app.models.user import User, UserRoleEnum
+from app.models.vendors import Vendors
 from app.schemas.auth import LoginRequest, TokenResponse, VerifyRequest, SignupRequest
 from app.utils.otp import generate_otp
 from app.core.security import create_access_token
@@ -29,6 +30,12 @@ async def signup(request: SignupRequest, db: Session = Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
+
+    if role == UserRoleEnum.vendoers:
+        vendor = Vendors(user_id=user.id)
+        db.add(vendor)
+        db.commit()
+
 
     otp = generate_otp()
     user.set_otp(otp)

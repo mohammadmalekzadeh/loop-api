@@ -8,6 +8,7 @@ from app.schemas.vendor import vendorsOption
 from app.models.request import Request, RequestStatusEnum
 from app.models.product import Product
 from app.deps.current_user import get_current_user, get_db
+from app.utils.nation_code_check import check_id
 
 router = APIRouter(prefix="/profile", tags=["Profile"])
 
@@ -38,7 +39,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
             "buy_items": buy_items
         }
 
-    if role == "vendor":
+    if role == "vendors":
         vendors = db.query(Vendors).filter(Vendors.user_id == current_user.id).first()
 
         if not vendors:
@@ -71,6 +72,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
             "name": current_user.name,
             "phone": current_user.phone,
             "role": current_user.role,
+            "nation_code": vendors.nation_code,
             "start_day": vendors.start_day,
             "end_day": vendors.end_day,
             "start_time": vendors.start_time,
@@ -102,6 +104,13 @@ async def updateVendors(request: vendorsOption, db: Session = Depends(get_db), c
     if not vendor:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vendor profile not found")
 
+    if not check_id(request.nation_code):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Nation Code is incorrect")
+
+    user = db.query(User).filter(current_user.id == User.id).first()
+    user.name = request.name
+    user.phone = request.phone
+
     vendor.nation_code = request.nation_code
     vendor.shop_name = request.shop_name
     vendor.shop_address = request.shop_address
@@ -111,5 +120,6 @@ async def updateVendors(request: vendorsOption, db: Session = Depends(get_db), c
     vendor.end_time = request.end_time
 
     db.commit()
+    db.refresh(user)
     db.refresh(vendor)
     return {"message": "Vendor info updated successfully", "vendor": vendor}

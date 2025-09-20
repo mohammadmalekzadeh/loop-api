@@ -31,7 +31,7 @@ async def signup(request: SignupRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
 
-    if role == UserRoleEnum.vendoers:
+    if role == UserRoleEnum.vendors:
         vendor = Vendors(user_id=user.id)
         db.add(vendor)
         db.commit()

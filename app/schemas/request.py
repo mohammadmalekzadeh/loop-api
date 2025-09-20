@@ -14,10 +14,10 @@ class RequestCreate(BaseModel):
 class RequestOut(BaseModel):
     id: int
     code: int
-    product_name: int
-    vendors_name: int
+    product_name: str
+    vendors_name: str
     address: str
-    customer_name: int
+    customer_name: str
     count: int
     date: datetime
     status: RequestStatusEnum

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models.request import Request, RequestStatusEnum
 from app.schemas.request import RequestCreate, RequestOut
-from app.models.user import User
+from app.models.user import User, UserRoleEnum
 from app.models.product import Product
 from app.models.vendors import Vendors
 from app.deps.current_user import get_current_user, get_db
@@ -18,7 +18,7 @@ async def create_request(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    user_role = current_user.role
+    user_role = UserRoleEnum(current_user.role)
 
     if user_role == "vendors":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Vendors couldn't create a request")
@@ -46,8 +46,7 @@ async def get_requests(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    user_role = current_user.role
-    status
+    user_role = UserRoleEnum(current_user.role)
     
     requests = db.query(Request).join(Product).join(Vendors).filter(Request.user_id == current_user.id).all()
 

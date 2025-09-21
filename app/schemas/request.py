@@ -8,7 +8,6 @@ class RequestStatusEnum(str, Enum):
 
 class RequestCreate(BaseModel):
     product_id: int
-    vendors_id: int
     count: int
 
 class RequestOut(BaseModel):

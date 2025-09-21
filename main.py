@@ -8,6 +8,7 @@ from app.api.v1.endpoints.user import router as user
 from app.api.v1.endpoints.request import request
 from app.api.v1.endpoints.adminPanel import router as adminPanel
 from app.api.v1.endpoints.profile.dashboard import router as profile
+from app.api.v1.endpoints.vendors.vendors import router as vendors
 
 app = FastAPI()
 
@@ -29,6 +30,7 @@ app.include_router(auth.router)
 app.include_router(user)
 app.include_router(request.router)
 app.include_router(profile)
+app.include_router(vendors)
 
 @app.on_event("startup")
 def on_startup():

@@ -27,9 +27,11 @@ async def create_request(
     while db.query(Request).filter(Request.code == unique_code).first():
         unique_code = random.randint(100000, 999999)
     
+    product = db.query(Product).filter(Product.id == req.product_id).first()
+
     new_request = Request(
         code=unique_code,
-        vendors_id=req.vendors_id,
+        vendors_id=product.vendors_id,
         user_id=current_user.id,
         product_id=req.product_id,
         count=req.count,

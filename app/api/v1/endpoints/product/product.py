@@ -1,0 +1,65 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from app.db.session import SessionLocal
+from app.models.vendors import Vendors
+from app.models.user import User, UserRoleEnum
+from app.models.product import Product
+from app.schemas.product import createProducts, updateProducts
+from app.deps.current_user import get_db, get_current_user
+
+router = APIRouter(prefix="/products", tags=["Products"])
+
+@router.get("/", summary="Get all products")
+async def getProducts(db: Session = Depends(get_db)):
+    query = db.query(Product).all()
+
+    results = []
+    for r in query:
+        results.append({
+            "id": r.id,
+            "name": r.name,
+            "type": r.type,
+            "vendor": r.vendors.user.name,
+            "shop": r.vendors.shop_name,
+            "address": r.vendors.shop_address,
+            "price": r.price,
+        })
+
+    return results
+
+@router.post("/create", summary="Post a new Products")
+async def postProducts(request: createProducts, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user.role != UserRoleEnum.vendors:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You don't access")
+    
+    vendors = db.query(Vendors).filter(Vendors.user_id == current_user.id).first()
+
+    if vendors.nation_code is None or vendors.shop_name is None or vendors.shop_address is None:
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="405_METHOD_NOT_ALLOWED")
+    
+    product = Product(
+        vendors_id= vendors.id,
+        name= request.name,
+        type= request.type,
+        price= request.price
+        )
+    
+    db.add(product)
+    db.commit()
+    db.refresh(product)
+
+@router.delete("/delete/{product_id}", summary="Delete Product")
+async def deleteProduct(product_id: int, db: Session = Depends(get_db)):
+    product = db.query(Product).filter(Product.id == product_id).first()
+
+    if not product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
+    
+    db.delete(product)
+    db.commit()
+
+
+
+
+
+

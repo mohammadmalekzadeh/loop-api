@@ -71,6 +71,8 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
             "id": current_user.id,
             "name": current_user.name,
             "phone": current_user.phone,
+            "shop_name": vendors.shop_name,
+            "shop_address": vendors.shop_address    ,
             "role": current_user.role,
             "nation_code": vendors.nation_code,
             "start_day": vendors.start_day,

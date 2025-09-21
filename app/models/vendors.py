@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 
@@ -14,6 +14,7 @@ class Vendors(Base):
     end_day = Column(String, nullable=True)
     start_time = Column(String, nullable=True)
     end_time = Column(String, nullable=True)
+    rate = Column(Float, nullable=True, default=0.0)
 
     user = relationship("User", back_populates="vendors")
     request = relationship("Request", back_populates="vendors")

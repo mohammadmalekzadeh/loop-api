@@ -15,7 +15,8 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",
-    "https://loop-ui-nu.vercel.app"
+    "https://loop-ui-nu.vercel.app",
+    "lloop.ir"
 ]
 
 app.add_middleware(

@@ -1,19 +1,26 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.db.session import SessionLocal
 from app.models.vendors import Vendors
 from app.models.user import User
 from app.models.product import Product
+from app.schemas.vendor import vendorsFilter
 from app.deps.current_user import get_db
 
 router = APIRouter(prefix="/vendors", tags=["Vendors"])
 
-@router.get("/", summary="Get all Vendors")
-async def getVendors(db: Session = Depends(get_db)):
-    query = db.query(Vendors).all()
+@router.get("", summary="Get all Vendors")
+async def getVendors(filter: vendorsFilter = Depends(), db: Session = Depends(get_db)):
+    query = db.query(Vendors)
+
+    if filter.rate:
+        query = query.order_by(Vendors.rate.desc() if filter.rate == "max" else Vendors.rate.asc())
+    if filter.is_work:
+        query = query.join(Product, Vendors.id == Product.vendors_id).group_by(Vendors.id).order_by(func.count(Product.id).desc())
 
     result = []
-    for v in query:
+    for v in query.all():
         result.append({
             "id": v.id,
             "name": v.user.name if v.user else None,

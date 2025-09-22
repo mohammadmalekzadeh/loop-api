@@ -11,3 +11,7 @@ class vendorsOption(BaseModel):
     end_day: Optional[str]
     start_time: Optional[str]
     end_time: Optional[str]
+
+class vendorsFilter(BaseModel):
+    rate: Optional[str] = None # from min or max
+    is_work: Optional[bool] = None # sort by products length

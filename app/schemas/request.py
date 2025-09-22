@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 from datetime import datetime
 from enum import Enum
 
@@ -23,3 +24,7 @@ class RequestOut(BaseModel):
 
     class Config:
         orm_mode = True
+
+class filterRequest(BaseModel):
+    status: Optional[str] = None # accepeted or pending
+    date: Optional[str] = None # old or new

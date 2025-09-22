@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, desc, asc
 from app.models.request import Request, RequestStatusEnum
-from app.schemas.request import RequestCreate, RequestOut
+from app.schemas.request import RequestCreate, RequestOut, filterRequest
 from app.models.user import User, UserRoleEnum
 from app.models.product import Product
 from app.models.vendors import Vendors
@@ -45,18 +45,24 @@ async def create_request(
 
 @router.get("/show", response_model=List[RequestOut])
 async def get_requests(
+    filter: filterRequest = Depends(),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     user_role = UserRoleEnum(current_user.role)
 
     if user_role == UserRoleEnum.customer:
-        requests = db.query(Request).filter(Request.user_id == current_user.id).all()
+        requests = db.query(Request).filter(Request.user_id == current_user.id)
     else:
-        requests = db.query(Request).join(Request.vendors).filter(Vendors.user_id == current_user.id).all()
+        requests = db.query(Request).join(Request.vendors).filter(Vendors.user_id == current_user.id)
+
+    if filter.status:
+        requests = requests.filter(Request.status == RequestStatusEnum.accepted if filter.status == "accepted" else Request.status == RequestStatusEnum.pending)
+    if filter.date:
+        requests = requests.order_by(asc(Request.date) if filter.date == "old" else desc(Request.date))
 
     result = []
-    for r in requests:
+    for r in requests.all():
         result.append({
             "id": r.id,
             "role": current_user.role,

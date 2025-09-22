@@ -17,7 +17,7 @@ async def getProducts(filter: filterProducts = Depends(), db: Session = Depends(
     if filter.type:
         query = query.filter(Product.type == filter.type)
     if filter.shop_name:
-        query = query.filter(Product.vendors.shop_name == filter.shop_name)
+        query = query.join(Vendors, Vendors.id == Product.vendors_id).filter(Vendors.shop_name == filter.shop_name)
     if filter.price:
         query = query.order_by(Product.price.desc() if filter.price == "max" else Product.price.asc())
     if filter.rate:

@@ -17,7 +17,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
     role = UserRoleEnum(current_user.role)
     query = db.query(Request).join(Product).join(Vendors).filter(Request.user_id == current_user.id)
 
-    if role == "customer":
+    if role == UserRoleEnum.customer:
         buy_requests = query.filter(Request.status == RequestStatusEnum.accepted).all()
 
         buy_items = []
@@ -27,8 +27,8 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
                 "name": req.product.name,
                 "type": req.product.type,
                 "price": req.product.price,
-                "buy_date": req.date.strftime("%Y-%m-%d %H:%M"),
-                "shop": req.vendors.name
+                "buy_date": req.date.strftime("%Y-%m-%d - %H:%M"),
+                "shop": req.vendors.shop_name
             })
 
         return {
@@ -39,7 +39,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
             "buy_items": buy_items
         }
 
-    if role == "vendors":
+    if role == UserRoleEnum.vendors:
         vendors = db.query(Vendors).filter(Vendors.user_id == current_user.id).first()
 
         if not vendors:
@@ -63,8 +63,8 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
                 "name": req.product.name,
                 "type": req.product.type,
                 "price": req.product.price,
-                "buy_date": req.date.strftime("%Y-%m-%d %H:%M"),    
-                "shop": req.user.name
+                "buy_date": req.date.strftime("%Y-%m-%d - %H:%M"),    
+                "shop": req.vendors.shop_name
             })
 
         return {

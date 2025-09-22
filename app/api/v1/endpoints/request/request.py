@@ -49,17 +49,21 @@ async def get_requests(
     current_user: User = Depends(get_current_user),
 ):
     user_role = UserRoleEnum(current_user.role)
-    
-    requests = db.query(Request).join(Product).join(Vendors).filter(Request.user_id == current_user.id).all()
+
+    if user_role == UserRoleEnum.customer:
+        requests = db.query(Request).filter(Request.user_id == current_user.id).all()
+    else:
+        requests = db.query(Request).join(Request.vendors).filter(Vendors.user_id == current_user.id).all()
 
     result = []
     for r in requests:
         result.append({
             "id": r.id,
+            "role": current_user.role,
             "code": r.code,
             "product_name": r.product.name,
-            "vendor_name": r.vendors.shop_name,
-            "address": r.vendors.address,
+            "vendors_name": r.vendors.user.name,
+            "address": r.vendors.shop_address,
             "customer_name": r.user.name,
             "count": r.count,
             "date": r.date.strftime("%Y-%m-%d %H:%M"),

@@ -15,7 +15,7 @@ async def getProducts(filter: filterProducts = Depends(), db: Session = Depends(
     query = db.query(Product)
 
     if filter.type:
-        query = query.filter(Product.type == type)
+        query = query.filter(Product.type == filter.type)
     if filter.shop_name:
         query = query.filter(Product.vendors.shop_name == filter.shop_name)
     if filter.price:

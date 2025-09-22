@@ -45,7 +45,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
         if not vendors:
             raise HTTPException(status_code=404, detail="Vendor profile not found")
 
-        sell_request = db.query(Product).filter(Product.vendors_id == vendors.id)
+        sell_request = db.query(Product).filter(Product.vendors_id == vendors.id).all()
         sell_items = []
         for p in sell_request:
             sell_items.append({
@@ -55,7 +55,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
                 "price": p.price,
             })
 
-        buy_request = query.filter(Request.status == RequestStatusEnum.accepted).all()
+        buy_request = db.query(Request).join(Product).join(Vendors).filter(Request.vendors_id == vendors.id).filter(Request.status == RequestStatusEnum.accepted).all()
         buy_items = []
         for req in buy_request:
             buy_items.append({
@@ -64,7 +64,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
                 "type": req.product.type,
                 "price": req.product.price,
                 "buy_date": req.date.strftime("%Y-%m-%d - %H:%M"),    
-                "shop": req.vendors.shop_name
+                "user_name": req.user.name
             })
 
         return {

@@ -47,19 +47,3 @@ async def postProducts(request: createProducts, current_user: User = Depends(get
     db.add(product)
     db.commit()
     db.refresh(product)
-
-@router.delete("/delete/{product_id}", summary="Delete Product")
-async def deleteProduct(product_id: int, db: Session = Depends(get_db)):
-    product = db.query(Product).filter(Product.id == product_id).first()
-
-    if not product:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
-    
-    db.delete(product)
-    db.commit()
-
-
-
-
-
-

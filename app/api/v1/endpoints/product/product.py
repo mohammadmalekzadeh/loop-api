@@ -12,7 +12,7 @@ router = APIRouter(prefix="/products", tags=["Products"])
 
 @router.get("", summary="Get all products")
 async def getProducts(filter: filterProducts = Depends(), db: Session = Depends(get_db)):
-    query = db.query(Product)
+    query = db.query(Product).filter(Product.is_active == True)
 
     if filter.type:
         query = query.filter(Product.type == filter.type)
@@ -56,8 +56,25 @@ async def postProducts(request: createProducts, current_user: User = Depends(get
         name= request.name,
         type= request.type,
         price= request.price,
+        is_active= True,
         )
     
     db.add(product)
     db.commit()
     db.refresh(product)
+
+@router.put("/is_active/{product_id}")
+async def activeUpdate(is_active: bool, product_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    product = db.query(Product).filter(Product.id == product_id).first()
+    
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    if product.vendors.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    product.is_active = is_active
+    db.commit()
+    db.refresh(product)
+
+    return {"message": "Product updated", "is_active": product.is_active}

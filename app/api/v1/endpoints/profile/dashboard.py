@@ -54,6 +54,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
                 "name": p.name,
                 "type": p.type,
                 "price": p.price,
+                "is_active": p.is_active,
             })
 
         buy_request = db.query(Request).join(Product).join(Vendors).filter(Request.vendors_id == vendors.id).filter(Request.status == RequestStatusEnum.accepted).all()

@@ -1,20 +1,32 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
+from typing import Optional
 from sqlalchemy.orm import Session
 from app.db.session import SessionLocal
 from app.models.vendors import Vendors
 from app.models.user import User, UserRoleEnum
 from app.models.product import Product
-from app.schemas.product import createProducts, updateProducts
+from app.schemas.product import createProducts, updateProducts, filterProducts
 from app.deps.current_user import get_db, get_current_user
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
-@router.get("/", summary="Get all products")
-async def getProducts(db: Session = Depends(get_db)):
-    query = db.query(Product).all()
+@router.get("", summary="Get all products")
+async def getProducts(filter: filterProducts = Depends(), db: Session = Depends(get_db)):
+    query = db.query(Product)
+
+    if filter.type:
+        query = query.filter(Product.type == type)
+    if filter.shop_name:
+        query = query.filter(Product.vendors.shop_name == filter.shop_name)
+    if filter.price:
+        query = query.order_by(Product.price.desc() if filter.price == "max" else Product.price.asc())
+    if filter.rate:
+        query = query.order_by(Product.rate.desc() if filter.rate == "max" else Product.rate.asc())
+    if filter.is_popular:
+        query = query.order_by(Product.buy_freq.desc())
 
     results = []
-    for r in query:
+    for r in query.all():
         results.append({
             "id": r.id,
             "name": r.name,
@@ -23,6 +35,8 @@ async def getProducts(db: Session = Depends(get_db)):
             "shop": r.vendors.shop_name,
             "address": r.vendors.shop_address,
             "price": r.price,
+            "rate": r.rate,
+            "buy_freq": r.buy_freq
         })
 
     return results
@@ -41,7 +55,7 @@ async def postProducts(request: createProducts, current_user: User = Depends(get
         vendors_id= vendors.id,
         name= request.name,
         type= request.type,
-        price= request.price
+        price= request.price,
         )
     
     db.add(product)

@@ -13,6 +13,7 @@ class Product(Base):
     rate = Column(Float, nullable=True, default=0.0)
     buy_freq = Column(Integer, nullable=True, default=0)
     is_active = Column(Boolean, default=True)
+    inventory = Column(Integer, default=1, nullable=False, server_default="1")
 
     vendors = relationship("Vendors", back_populates="product")
     request = relationship("Request", back_populates="product")

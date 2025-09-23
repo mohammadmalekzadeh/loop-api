@@ -30,6 +30,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
                 "buy_date": req.date.strftime("%Y-%m-%d - %H:%M"),
                 "shop": req.vendors.shop_name,
                 "rate": req.product.rate,
+                "count": req.count,
             })
 
         return {
@@ -55,6 +56,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
                 "type": p.type,
                 "price": p.price,
                 "is_active": p.is_active,
+                "inventory": p.inventory
             })
 
         buy_request = db.query(Request).join(Product).join(Vendors).filter(Request.vendors_id == vendors.id).filter(Request.status == RequestStatusEnum.accepted).all()
@@ -68,6 +70,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
                 "buy_date": req.date.strftime("%Y-%m-%d - %H:%M"),    
                 "user_name": req.user.name,
                 "rate": req.product.rate,
+                "count": req.count
             })
 
         return {

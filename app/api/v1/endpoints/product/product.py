@@ -36,7 +36,8 @@ async def getProducts(filter: filterProducts = Depends(), db: Session = Depends(
             "address": r.vendors.shop_address,
             "price": r.price,
             "rate": r.rate,
-            "buy_freq": r.buy_freq
+            "buy_freq": r.buy_freq,
+            "inventory": r.inventory
         })
 
     return results
@@ -57,6 +58,7 @@ async def postProducts(request: createProducts, current_user: User = Depends(get
         type= request.type,
         price= request.price,
         is_active= True,
+        inventory= request.inventory,
         )
     
     db.add(product)
@@ -78,3 +80,7 @@ async def activeUpdate(is_active: bool, product_id: int, current_user: User = De
     db.refresh(product)
 
     return {"message": "Product updated", "is_active": product.is_active}
+
+@router.put("/edit", summary="Product edit")
+async def editProduct():
+    ...

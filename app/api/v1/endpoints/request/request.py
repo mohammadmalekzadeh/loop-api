@@ -29,6 +29,9 @@ async def create_request(
     
     product = db.query(Product).filter(Product.id == req.product_id).first()
 
+    if product.inventory == req.count: product.inventory = 0; product.is_active = False
+    else: product.inventory -= req.count
+
     new_request = Request(
         code=unique_code,
         vendors_id=product.vendors_id,
@@ -40,6 +43,7 @@ async def create_request(
     db.add(new_request)
     db.commit()
     db.refresh(new_request)
+    db.refresh(product)
     return new_request
 
 

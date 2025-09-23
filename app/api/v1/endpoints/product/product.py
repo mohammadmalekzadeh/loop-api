@@ -74,6 +74,9 @@ async def activeUpdate(is_active: bool, product_id: int, current_user: User = De
 
     if product.vendors.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized")
+    
+    if product.inventory == 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inventory is Zero")
 
     product.is_active = is_active
     db.commit()

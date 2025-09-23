@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Body
 from typing import Optional
 from sqlalchemy.orm import Session
 from app.db.session import SessionLocal
@@ -84,6 +84,23 @@ async def activeUpdate(is_active: bool, product_id: int, current_user: User = De
 
     return {"message": "Product updated", "is_active": product.is_active}
 
-@router.put("/edit", summary="Product edit")
-async def editProduct():
-    ...
+@router.put("/edit/{product_id}", summary="Product edit")
+async def editProduct(product_id: int, req: updateProducts = Body(...), db: Session = Depends(get_db), current_user: Session = Depends(get_current_user)):
+    product = db.query(Product).filter(Product.id == product_id).first()
+    
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    if product.vendors.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    product.name = req.name
+    product.type = req.type
+    product.price = req.price
+    product.inventory = req.inventory
+    if product.inventory > 0 : product.is_active = True
+
+    db.commit()
+    db.refresh(product)
+
+    return {"message": "Product updated"}

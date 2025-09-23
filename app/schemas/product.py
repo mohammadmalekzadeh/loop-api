@@ -8,7 +8,10 @@ class createProducts(BaseModel):
     inventory: int
 
 class updateProducts(BaseModel):
-    is_active: bool
+    name: str
+    type: str
+    price: int
+    inventory: int
 
 class filterProducts(BaseModel):
     type: Optional[str] = None

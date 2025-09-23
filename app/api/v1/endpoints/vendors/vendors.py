@@ -70,6 +70,7 @@ async def getVendorsProducts(vendors_id: int, db: Session = Depends(get_db)):
                 "price": p.price,
                 "buy_freq": p.buy_freq,
                 "rate": p.rate,
+                "inventory": p.inventory
             }
             for p in query.product
         ]

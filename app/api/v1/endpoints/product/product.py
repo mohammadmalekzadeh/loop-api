@@ -24,6 +24,8 @@ async def getProducts(filter: filterProducts = Depends(), db: Session = Depends(
         query = query.order_by(Product.rate.desc() if filter.rate == "max" else Product.rate.asc())
     if filter.is_popular:
         query = query.order_by(Product.buy_freq.desc())
+    if filter.newest:
+        query = query.order_by(Product.id.desc())
 
     results = []
     for r in query.all():

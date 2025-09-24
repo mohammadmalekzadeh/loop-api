@@ -22,6 +22,7 @@ class RequestOut(BaseModel):
     date: datetime
     jalali_date: str
     status: RequestStatusEnum
+    price: int
 
     class Config:
         orm_mode = True

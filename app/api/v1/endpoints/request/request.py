@@ -81,7 +81,8 @@ async def get_requests(
             "count": r.count,
             "date": r.date,
             "jalali_date": JalaliDatetime(r.date).strftime("%Y/%m/%d - %H:%M"),
-            "status": r.status
+            "status": r.status,
+            "price": r.product.price * r.count,
         })
 
     return result

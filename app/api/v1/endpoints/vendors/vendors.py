@@ -18,6 +18,8 @@ async def getVendors(filter: vendorsFilter = Depends(), db: Session = Depends(ge
         query = query.order_by(Vendors.rate.desc() if filter.rate == "max" else Vendors.rate.asc())
     if filter.is_work:
         query = query.join(Product, Vendors.id == Product.vendors_id).group_by(Vendors.id).order_by(func.count(Product.id).desc())
+    if filter.newest:
+        query = query.order_by(Vendors.id.desc())
 
     result = []
     for v in query.all():

@@ -15,3 +15,4 @@ class vendorsOption(BaseModel):
 class vendorsFilter(BaseModel):
     rate: Optional[str] = None # from min or max
     is_work: Optional[bool] = None # sort by products length
+    newest: Optional[bool] = None

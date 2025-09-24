@@ -64,6 +64,8 @@ async def get_requests(
         requests = requests.filter(Request.status == RequestStatusEnum.accepted if filter.status == "accepted" else Request.status == RequestStatusEnum.pending)
     if filter.date:
         requests = requests.order_by(asc(Request.date) if filter.date == "old" else desc(Request.date))
+    if filter.code:
+        requests = requests.filter(Request.code == filter.code)
 
     result = []
     for r in requests.all():

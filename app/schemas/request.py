@@ -28,3 +28,4 @@ class RequestOut(BaseModel):
 class filterRequest(BaseModel):
     status: Optional[str] = None # accepeted or pending
     date: Optional[str] = None # old or new
+    code: Optional[int] = None

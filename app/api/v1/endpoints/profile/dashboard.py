@@ -9,6 +9,7 @@ from app.models.request import Request, RequestStatusEnum
 from app.models.product import Product
 from app.deps.current_user import get_current_user, get_db
 from app.utils.nation_code_check import check_id
+from khayyam import JalaliDatetime
 
 router = APIRouter(prefix="/profile", tags=["Profile"])
 
@@ -27,7 +28,8 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
                 "name": req.product.name,
                 "type": req.product.type,
                 "price": req.product.price,
-                "buy_date": req.date.strftime("%Y-%m-%d - %H:%M"),
+                "buy_date": req.date,
+                "jalali_date": JalaliDatetime(req.date).strftime("%Y/%m/%d - %H:%M"),
                 "shop": req.vendors.shop_name,
                 "rate": req.product.rate,
                 "count": req.count,
@@ -67,7 +69,8 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
                 "name": req.product.name,
                 "type": req.product.type,
                 "price": req.product.price,
-                "buy_date": req.date.strftime("%Y-%m-%d - %H:%M"),    
+                "buy_date": req.date,
+                "jalali_date": JalaliDatetime(req.date).strftime("%Y/%m/%d - %H:%M"),
                 "user_name": req.user.name,
                 "rate": req.product.rate,
                 "count": req.count

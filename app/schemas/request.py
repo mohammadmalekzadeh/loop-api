@@ -20,6 +20,7 @@ class RequestOut(BaseModel):
     customer_name: str
     count: int
     date: datetime
+    jalali_date: str
     status: RequestStatusEnum
 
     class Config:

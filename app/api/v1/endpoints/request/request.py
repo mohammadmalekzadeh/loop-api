@@ -9,6 +9,7 @@ from app.models.vendors import Vendors
 from app.deps.current_user import get_current_user, get_db
 from typing import List
 import random
+from khayyam import JalaliDatetime
 
 router = APIRouter(prefix="/request", tags=["Request"])
 
@@ -78,7 +79,8 @@ async def get_requests(
             "address": r.vendors.shop_address,
             "customer_name": r.user.name,
             "count": r.count,
-            "date": r.date.strftime("%Y-%m-%d %H:%M"),
+            "date": r.date,
+            "jalali_date": JalaliDatetime(r.date).strftime("%Y/%m/%d - %H:%M"),
             "status": r.status
         })
 

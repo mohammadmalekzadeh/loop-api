@@ -26,6 +26,7 @@ async def getVendors(filter: vendorsFilter = Depends(), db: Session = Depends(ge
         result.append({
             "id": v.id,
             "name": v.user.name if v.user else None,
+            "avatar": v.profile_image,
             "shop_name": v.shop_name,
             "shop_address": v.shop_address,
             "start_day": v.start_day,
@@ -57,6 +58,7 @@ async def getVendorsProducts(vendors_id: int, db: Session = Depends(get_db)):
 
     results = {
         "name": query.user.name if query.user else None,
+        "avatar": query.profile_image,
         "shop_name": query.shop_name,
         "shop_address": query.shop_address,
         "start_day": query.start_day,

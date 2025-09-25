@@ -19,7 +19,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
     query = db.query(Request).join(Product).join(Vendors).filter(Request.user_id == current_user.id)
 
     if role == UserRoleEnum.customer:
-        buy_requests = query.filter(Request.status == RequestStatusEnum.accepted).all()
+        buy_requests = query.filter(Request.status == RequestStatusEnum.accepted).order_by(Request.id.desc()).all()
 
         buy_items = []
         for req in buy_requests:
@@ -49,7 +49,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
         if not vendors:
             raise HTTPException(status_code=404, detail="Vendor profile not found")
 
-        sell_request = db.query(Product).filter(Product.vendors_id == vendors.id).all()
+        sell_request = db.query(Product).filter(Product.vendors_id == vendors.id).order_by(Product.id.desc()).all()
         sell_items = []
         for p in sell_request:
             sell_items.append({
@@ -61,7 +61,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
                 "inventory": p.inventory
             })
 
-        buy_request = db.query(Request).join(Product).join(Vendors).filter(Request.vendors_id == vendors.id).filter(Request.status == RequestStatusEnum.accepted).all()
+        buy_request = db.query(Request).join(Product).join(Vendors).filter(Request.vendors_id == vendors.id).filter(Request.status == RequestStatusEnum.accepted).order_by(Request.id.desc()).all()
         buy_items = []
         for req in buy_request:
             buy_items.append({

@@ -27,7 +27,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
                 "id": req.id,
                 "name": req.product.name,
                 "type": req.product.type,
-                "price": req.product.price,
+                "price": req.product.price * req.count,
                 "buy_date": req.date,
                 "jalali_date": JalaliDatetime(req.date).strftime("%Y/%m/%d - %H:%M"),
                 "shop": req.vendors.shop_name,
@@ -49,6 +49,8 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
         if not vendors:
             raise HTTPException(status_code=404, detail="Vendor profile not found")
 
+        income = 0
+
         sell_request = db.query(Product).filter(Product.vendors_id == vendors.id).order_by(Product.id.desc()).all()
         sell_items = []
         for p in sell_request:
@@ -68,13 +70,14 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
                 "id": req.id,
                 "name": req.product.name,
                 "type": req.product.type,
-                "price": req.product.price,
+                "price": req.product.price * req.count,
                 "buy_date": req.date,
                 "jalali_date": JalaliDatetime(req.date).strftime("%Y/%m/%d - %H:%M"),
                 "user_name": req.user.name,
                 "rate": req.product.rate,
                 "count": req.count
             })
+            income += req.product.price * req.count
 
         return {
             "id": current_user.id,
@@ -91,7 +94,8 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
             "start_time": vendors.start_time,
             "end_time": vendors.end_time,
             "sell_items": sell_items,
-            "buy_items": buy_items
+            "buy_items": buy_items,
+            "income": income
         }
 
 @router.put("/update/user", summary="Updtae User Info")

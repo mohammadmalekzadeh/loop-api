@@ -7,6 +7,9 @@ from app.models.vendors import Vendors
 from app.schemas.auth import LoginRequest, TokenResponse, VerifyRequest, SignupRequest
 from app.utils.otp import generate_otp
 from app.core.security import create_access_token
+from app.core.config import SMS_USERNAME, SMS_NUMBER, SMS_PASSWORD , SMS_API
+from melipayamak import Api
+import requests
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -36,12 +39,20 @@ async def signup(request: SignupRequest, db: Session = Depends(get_db)):
         db.add(vendor)
         db.commit()
 
-
     otp = generate_otp()
     user.set_otp(otp)
     db.commit()
 
-    # SMS
+    # api = Api(SMS_USERNAME, SMS_PASSWORD)
+    # sms = api.sms()
+    # response1 = sms.send(to= '0'+request.phone, _from= SMS_NUMBER, text= otp)
+
+    # data = {'username': SMS_USERNAME, 'password': SMS_PASSWORD, 'from': SMS_NUMBER, 'to': '0'+request.phone, 'text': otp}
+    # response2 = requests.post(str(SMS_API), json= data)
+
+    # return {"response1": response1, "response2": response2.json(), "data": data}
+
+
     return {"otp": otp}
 
 @router.post("/login")

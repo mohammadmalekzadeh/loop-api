@@ -9,11 +9,14 @@ CODE: {otp}
 lloop.ir/home
     """
 
-def request_customer_sms(product_name, request_code):
+def request_customer_sms(product_name, request_code, request_count):
     return f"""
-درخواست شما برای محصول {product_name} با موفقیت ثبت شد.
+درخواست شما با موفقیت ثبت شد.
 
+محصول {product_name} به تعداد {request_count}
 کد درخواست: {request_code}
+
+lloop.ir/dashboard/requests
 
 lloop.ir/dashboard/requests
     """

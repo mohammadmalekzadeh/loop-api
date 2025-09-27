@@ -141,7 +141,7 @@ async def postRate(
     product = db.query(Product).filter(request.product_id == Product.id).first()
 
     vendors.rate = round((vendors.rate + rate) / 2, 2) if vendors.rate != 0 else rate
-    product.rate = round((product.rate + rate), 2) / 2 if product.rate != 0 else rate
+    product.rate = round((product.rate + rate) / 2, 2) if product.rate != 0 else rate
 
     db.commit()
     db.refresh(vendors)

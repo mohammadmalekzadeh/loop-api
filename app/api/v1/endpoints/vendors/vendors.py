@@ -43,7 +43,7 @@ async def getVendors(filter: vendorsFilter = Depends(), db: Session = Depends(ge
                     "buy_freq": p.buy_freq,
                     "rate": p.rate,
                 }
-                for p in v.product
+                for p in v.product if p.is_active
             ]
         })
 
@@ -76,7 +76,7 @@ async def getVendorsProducts(vendors_id: int, db: Session = Depends(get_db)):
                 "rate": p.rate,
                 "inventory": p.inventory
             }
-            for p in query.product
+            for p in query.product if p.is_active
         ]
     }
 

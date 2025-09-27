@@ -47,7 +47,7 @@ async def create_request(
     db.refresh(product)
 
     # send sms for request to customer
-    sms_sender(phone= current_user.phone, message= request_vendors_sms(product_name= product.name, request_code= new_request.code, request_count= new_request.count))
+    sms_sender(phone= current_user.phone, message= request_customer_sms(product_name= product.name, request_code= new_request.code, request_count= new_request.count))
 
     # send sms for request to vendprs
     vendors = db.query(Vendors).join(Product).filter(Vendors.id == Product.vendors_id).first()

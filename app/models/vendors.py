@@ -16,6 +16,7 @@ class Vendors(Base):
     end_time = Column(String, nullable=True)
     rate = Column(Float, nullable=True, default=0.0)
     profile_image = Column(String, default="/vendors/default.jpg")
+    income = Column(Integer, default="0")
 
     user = relationship("User", back_populates="vendors")
     request = relationship("Request", back_populates="vendors")

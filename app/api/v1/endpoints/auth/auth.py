@@ -7,9 +7,8 @@ from app.models.vendors import Vendors
 from app.schemas.auth import LoginRequest, TokenResponse, VerifyRequest, SignupRequest
 from app.utils.otp import generate_otp
 from app.core.security import create_access_token
-from app.core.config import SMS_USERNAME, SMS_NUMBER, SMS_PASSWORD , SMS_API
-from melipayamak import Api
-import requests
+from app.utils.sms_text import otp_sms
+from app.utils.sms_sender import sms_sender
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -43,17 +42,10 @@ async def signup(request: SignupRequest, db: Session = Depends(get_db)):
     user.set_otp(otp)
     db.commit()
 
-    # api = Api(SMS_USERNAME, SMS_PASSWORD)
-    # sms = api.sms()
-    # response1 = sms.send(to= '0'+request.phone, _from= SMS_NUMBER, text= otp)
+    # SMS
+    response = sms_sender(phone= request.phone, message= otp_sms(name= request.name, otp= otp))
 
-    # data = {'username': SMS_USERNAME, 'password': SMS_PASSWORD, 'from': SMS_NUMBER, 'to': '0'+request.phone, 'text': otp}
-    # response2 = requests.post(str(SMS_API), json= data)
-
-    # return {"response1": response1, "response2": response2.json(), "data": data}
-
-
-    return {"otp": otp}
+    return {"response": response}
 
 @router.post("/login")
 async def login(request: LoginRequest, db: Session = Depends(get_db)):
@@ -67,7 +59,9 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
     db.commit()
 
     # SMS
-    return {"otp": otp}
+    response = sms_sender(phone= request.phone, message= otp_sms(name= user.name, otp= otp))
+
+    return {"response": response}
 
 @router.post("/verify", response_model= TokenResponse)
 async def verify(request: VerifyRequest, db: Session = Depends(get_db)):
@@ -80,7 +74,7 @@ async def verify(request: VerifyRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code= status.HTTP_400_BAD_REQUEST, detail={"data" : "Invalid OTP"})
     
     if user.otp_expiration < datetime.utcnow():
-        raise HTTPException(status_code= status.HTTP_400_BAD_REQUEST, detail={"data" : "OTP expire"})
+        raise HTTPException(status_code= status.HTTP_406_NOT_ACCEPTABLE, detail={"data" : "OTP expire"})
 
     token = create_access_token({"sub": str(user.id)})
     return {"access_token": token, "token_type": "bearer"}

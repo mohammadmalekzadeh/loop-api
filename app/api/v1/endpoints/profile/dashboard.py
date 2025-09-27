@@ -77,7 +77,6 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
                 "rate": req.product.rate,
                 "count": req.count
             })
-            income += req.product.price * req.count
 
         return {
             "id": current_user.id,
@@ -95,7 +94,7 @@ async def getUser(db: Session = Depends(get_db), current_user: User = Depends(ge
             "end_time": vendors.end_time,
             "sell_items": sell_items,
             "buy_items": buy_items,
-            "income": income
+            "income": vendors.income,
         }
 
 @router.put("/update/user", summary="Updtae User Info")

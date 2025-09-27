@@ -10,6 +10,8 @@ from app.deps.current_user import get_current_user, get_db
 from typing import List
 import random
 from khayyam import JalaliDatetime
+from app.utils.sms_sender import sms_sender
+from app.utils.sms_text import request_customer_sms, request_vendors_sms
 
 router = APIRouter(prefix="/request", tags=["Request"])
 
@@ -19,9 +21,7 @@ async def create_request(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    user_role = UserRoleEnum(current_user.role)
-
-    if user_role == "vendors":
+    if current_user.role == UserRoleEnum.vendors:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Vendors couldn't create a request")
 
     unique_code = random.randint(100000, 999999)
@@ -45,6 +45,14 @@ async def create_request(
     db.commit()
     db.refresh(new_request)
     db.refresh(product)
+
+    # send sms for request to customer
+    sms_sender(phone= current_user.phone, message= request_vendors_sms(product_name= product.name, request_code= new_request.code, request_count= new_request.count))
+
+    # send sms for request to vendprs
+    vendors = db.query(Vendors).join(Product).filter(Vendors.id == Product.vendors_id).first()
+    sms_sender(phone= vendors.user.phone, message= request_vendors_sms(product_name= product.name, request_code= new_request.code, request_count= new_request.count))
+
     return new_request
 
 
@@ -104,6 +112,8 @@ async def update_request_status(
         raise HTTPException(status_code= status.HTTP_403_FORBIDDEN, detail="FORBIDDEN")
 
     product = db.query(Product).filter(Product.id == req.product_id).first()
+    vendors = db.query(Vendors).filter(req.vendors_id == product.vendors_id).first()
+    vendors.income += req.count * product.price
 
     product.buy_freq =+ req.count
     req.status = status_value
@@ -111,6 +121,7 @@ async def update_request_status(
     db.commit()
     db.refresh(req)
     db.refresh(product)
+    db.refresh(vendors)
 
     return {"message": "وضعیت با موفقیت تغییر کرد", "status": req.status}
 

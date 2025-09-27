@@ -13,6 +13,7 @@ alembic
 khayyam
 boto3
 python-multipart
-zeep
 requests
-melipayamak
+http
+httpx
+json

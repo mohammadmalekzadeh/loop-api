@@ -83,7 +83,7 @@ async def get_requests(
             "role": current_user.role,
             "code": r.code,
             "product_name": r.product.name,
-            "vendors_name": r.vendors.user.name,
+            "shop_name": r.vendors.shop_name,
             "address": r.vendors.shop_address,
             "customer_name": r.user.name,
             "count": r.count,

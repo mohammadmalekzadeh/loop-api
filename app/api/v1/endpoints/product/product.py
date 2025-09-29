@@ -16,9 +16,11 @@ router = APIRouter(prefix="/products", tags=["Products"])
 async def getProducts(filter: filterProducts = Depends(), db: Session = Depends(get_db), redis = Depends(get_redis)):
     cache_key = f"products:{filter.type}:{filter.shop_name}:{filter.price}:{filter.rate}:{filter.is_popular}:{filter.newest}"
     
-    cached = await redis.get(cache_key)
-    if cached:
-        return json.loads(cached)
+    redis = await get_redis()
+    if redis:
+        cached = await redis.get(cache_key)
+        if cached:
+            return json.loads(cached)
 
     query = db.query(Product).filter(Product.is_active == True)
 
@@ -50,7 +52,9 @@ async def getProducts(filter: filterProducts = Depends(), db: Session = Depends(
             "inventory": r.inventory
         })
 
-    await redis.set(cache_key, json.dumps(results), ex=REDIS_TTL)
+    if redis:
+        await redis.set(cache_key, json.dumps(results), ex=REDIS_TTL)
+    
     return results
 
 @router.post("/create", summary="Post a new Products")

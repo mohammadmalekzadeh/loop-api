@@ -28,10 +28,10 @@ async def create_request(
     while db.query(Request).filter(Request.code == unique_code).first():
         unique_code = random.randint(100000, 999999)
     
-    product = db.query(Product).filter(Product.id == req.product_id).first()
+    product = db.query(Product).join(Vendors).filter(Product.id == req.product_id).first()
 
-    if product.inventory == req.count: product.inventory = 0; product.is_active = False
-    else: product.inventory -= req.count
+    if product.inventory > req.count: product.inventory -= req.count
+    else: product.inventory = 0; product.is_active = False
 
     new_request = Request(
         code=unique_code,
@@ -47,7 +47,7 @@ async def create_request(
     db.refresh(product)
 
     # send sms for request to customer
-    sms_sender(phone= current_user.phone, message= request_customer_sms(product_name= product.name, request_code= new_request.code, request_count= new_request.count))
+    sms_sender(phone= current_user.phone, message= request_customer_sms(product_name= product.name, request_code= new_request.code, request_count= new_request.count, shop_name= product.vendors.shop_name))
 
     # send sms for request to vendprs
     vendors = db.query(Vendors).join(Product).filter(Vendors.id == Product.vendors_id).first()

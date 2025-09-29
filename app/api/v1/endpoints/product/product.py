@@ -7,11 +7,19 @@ from app.models.user import User, UserRoleEnum
 from app.models.product import Product
 from app.schemas.product import createProducts, updateProducts, filterProducts
 from app.deps.current_user import get_db, get_current_user
+from app.core.redis_client import get_redis, REDIS_TTL
+import json
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
 @router.get("", summary="Get all products")
-async def getProducts(filter: filterProducts = Depends(), db: Session = Depends(get_db)):
+async def getProducts(filter: filterProducts = Depends(), db: Session = Depends(get_db), redis = Depends(get_redis)):
+    cache_key = f"products:{filter.type}:{filter.shop_name}:{filter.price}:{filter.rate}:{filter.is_popular}:{filter.newest}"
+    
+    cached = await redis.get(cache_key)
+    if cached:
+        return json.loads(cached)
+
     query = db.query(Product).filter(Product.is_active == True)
 
     if filter.type:
@@ -42,6 +50,7 @@ async def getProducts(filter: filterProducts = Depends(), db: Session = Depends(
             "inventory": r.inventory
         })
 
+    await redis.set(cache_key, json.dumps(results), ex=REDIS_TTL)
     return results
 
 @router.post("/create", summary="Post a new Products")

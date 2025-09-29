@@ -20,21 +20,8 @@ Built with **FastAPI** and **SQLAlchemy**, it handles authentication, data persi
 
 ```bash
 loop-api/
-├── .env
-├── .env.example
-├── .gitignore
-├── alembic.ini
-├── LICENSE
-├── main.py
-├── README.md
-├── requirements.txt
-│
-├─── .github/workflows
-│       liara.yaml
+├─── .github/
 ├─── alembic/
-│       env.py
-│       script.py.mako
-│       versions/
 ├─── app/
 │   ├── api/v1/endpoints/
 │   ├── core/
@@ -44,7 +31,13 @@ loop-api/
 │   ├── schemas/
 │   ├── services/
 │   └── utils/
-└─── tests/
+├── tests/
+├── .gitignore
+├── alembic.ini
+├── LICENSE
+├── main.py
+├── README.md
+└─── requirements.txt
 
 ```
 

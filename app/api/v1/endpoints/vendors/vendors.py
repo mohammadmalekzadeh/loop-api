@@ -12,7 +12,7 @@ router = APIRouter(prefix="/vendors", tags=["Vendors"])
 
 @router.get("", summary="Get all Vendors")
 async def getVendors(filter: vendorsFilter = Depends(), db: Session = Depends(get_db)):
-    query = db.query(Vendors)
+    query = db.query(Vendors).filter(Vendors.nation_code != None)
 
     if filter.rate:
         query = query.order_by(Vendors.rate.desc() if filter.rate == "max" else Vendors.rate.asc())

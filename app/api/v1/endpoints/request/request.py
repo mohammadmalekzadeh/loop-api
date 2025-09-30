@@ -9,10 +9,9 @@ from app.models.vendors import Vendors
 from app.deps.current_user import get_current_user, get_db
 from typing import List
 import random
-from khayyam import JalaliDatetime
 from app.utils.sms_sender import sms_sender
 from app.utils.sms_text import request_customer_sms, request_vendors_sms
-import pytz
+from app.utils.datetime_format import correct_format
 
 router = APIRouter(prefix="/request", tags=["Request"])
 
@@ -89,7 +88,7 @@ async def get_requests(
             "customer_name": r.user.name,
             "count": r.count,
             "date": r.date,
-            "jalali_date": JalaliDatetime(r.date).strftime("%Y/%m/%d - %H:%M"),
+            "jalali_date": correct_format(r.date),
             "status": r.status,
             "price": r.product.price * r.count,
         })

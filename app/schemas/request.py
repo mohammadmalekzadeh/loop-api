@@ -15,7 +15,7 @@ class RequestOut(BaseModel):
     id: int
     code: int
     product_name: str
-    vendors_name: str
+    shop_name: str
     address: str
     customer_name: str
     count: int

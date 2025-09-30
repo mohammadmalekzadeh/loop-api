@@ -12,6 +12,7 @@ import random
 from khayyam import JalaliDatetime
 from app.utils.sms_sender import sms_sender
 from app.utils.sms_text import request_customer_sms, request_vendors_sms
+import pytz
 
 router = APIRouter(prefix="/request", tags=["Request"])
 
@@ -113,7 +114,7 @@ async def update_request_status(
 
     product = db.query(Product).filter(Product.id == req.product_id).first()
     vendors = db.query(Vendors).filter(req.vendors_id == product.vendors_id).first()
-    vendors.income += req.count * product.price
+    vendors.income = (vendors.income or 0) + req.count * product.price
 
     product.buy_freq =+ req.count
     req.status = status_value

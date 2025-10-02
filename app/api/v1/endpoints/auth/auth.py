@@ -6,7 +6,7 @@ from app.models.user import User, UserRoleEnum
 from app.models.vendors import Vendors
 from app.schemas.auth import LoginRequest, TokenResponse, VerifyRequest, SignupRequest
 from app.utils.otp import generate_otp
-from app.core.security import create_access_token
+from app.core.security import create_access_token, create_refresh_token
 from app.utils.sms_text import otp_sms
 from app.utils.sms_sender import sms_sender
 
@@ -76,5 +76,7 @@ async def verify(request: VerifyRequest, db: Session = Depends(get_db)):
     if user.otp_expiration < datetime.utcnow():
         raise HTTPException(status_code= status.HTTP_406_NOT_ACCEPTABLE, detail={"data" : "OTP expire"})
 
-    token = create_access_token({"sub": str(user.id)})
-    return {"access_token": token, "token_type": "bearer"}
+    access_token = create_access_token({"sub": str(user.id)})
+    refresh_token = create_refresh_token({"sub": str(user.id)})
+
+    return {"access_token": access_token, "token_type": "bearer"}

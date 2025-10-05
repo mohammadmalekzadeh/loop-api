@@ -1,6 +1,7 @@
 pip
 fastapi
 uvicorn
+supervisor
 SQLAlchemy
 pydantic
 python-dotenv

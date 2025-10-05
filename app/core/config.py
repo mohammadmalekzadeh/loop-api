@@ -5,7 +5,6 @@ import os
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-TEST_DB_URL = os.getenv("TEST_DB_URL")
 SECRET_KEY = os.getenv("SECRET_KEY")
 REFRESH_SECRET_KEY = os.getenv("REFRESH_SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")

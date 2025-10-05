@@ -2,6 +2,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from app.db.init_db import init_db
 from app.api.v1.endpoints.auth import auth
 from app.api.v1.endpoints.user import router as user
@@ -12,7 +13,12 @@ from app.api.v1.endpoints.vendors.vendors import router as vendors
 from app.api.v1.endpoints.product.product import router as products
 from app.api.v1.endpoints.vendors.upload_avatar import router as upload_avatar
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 origins = [
     "http://localhost:3000",
@@ -39,10 +45,6 @@ app.include_router(profile)
 app.include_router(vendors)
 app.include_router(products)
 app.include_router(upload_avatar)
-
-@app.on_event("startup")
-def on_startup():
-    init_db()
 
 @app.get('/')
 def read_root():

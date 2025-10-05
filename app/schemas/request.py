@@ -24,8 +24,9 @@ class RequestOut(BaseModel):
     status: RequestStatusEnum
     price: int
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class filterRequest(BaseModel):
     status: Optional[str] = None # accepeted or pending

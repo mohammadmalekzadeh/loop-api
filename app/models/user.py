@@ -23,4 +23,4 @@ class User(Base):
 
     def set_otp(self, code: str):
         self.otp_code = code
-        self.otp_expiration = datetime.utcnow() + timedelta(minutes=5)
+        self.otp_expiration = datetime.utcnow() + timedelta(minutes=1)

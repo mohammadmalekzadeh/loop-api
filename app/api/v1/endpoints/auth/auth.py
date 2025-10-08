@@ -45,7 +45,7 @@ async def signup(request: SignupRequest, db: Session = Depends(get_db)):
     # SMS
     response = sms_sender(phone= request.phone, message= otp_sms(name= request.name, otp= otp))
 
-    return {"response": response}
+    return {"response": response, "otp": otp}
 
 @router.post("/login")
 async def login(request: LoginRequest, db: Session = Depends(get_db)):
@@ -61,7 +61,7 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
     # SMS
     response = sms_sender(phone= request.phone, message= otp_sms(name= user.name, otp= otp))
 
-    return {"response": response}
+    return {"response": response, "otp": otp}
 
 @router.post("/verify", response_model= TokenResponse)
 async def verify(request: VerifyRequest, db: Session = Depends(get_db)):
